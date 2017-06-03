@@ -1,4 +1,6 @@
 #include <math.h>
+#include <share.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -10,6 +12,13 @@
 /*Manuel Apilongo  */ /**/
 /*mtr:175880       */ /**/
 /*******************/ /***************************************************************/
+int stop;
+
+void esci(int x) {
+  stop = 1;
+  return;
+}
+
 int main() {
   int dim_out = 0, dim_out1 = 0, old_dim_out = 0, k, epoca = 0, sel_ts, sel_net,
       *occ, modo, modo1;
@@ -20,7 +29,11 @@ int main() {
   Retestr struttura;
   Retetrg struttura2, struttura3;
   FILE* ptrfile;
+  FILE* gnuplot;
+  /*inizializzo il trapper*/
+  signal(SIGINT, esci);
   /*cerco i file da aprire*/
+  gnuplot = crea_grafico_pipe();
   INNF = apri_dir();
   sel_net = apri_files_net(INNF); /*lista file .net disponibili*/
   if (sel_net != -1 && sel_net != -2)
@@ -38,7 +51,7 @@ int main() {
     }
   }
   /**************************************************/
-  /*modalitá funzionamento*/
+  /*modalitï¿½ funzionamento*/
   if (struttura2->dim_out == 0 && (sel_net != -1)) {
     if (struttura->pesi == NULL) {
       printf("\n**pesi nel File .net necessari per computare il file .ts**\n");
@@ -57,7 +70,7 @@ int main() {
     printf("\n**File .net necessario per computare il file .ts**\n");
     system("PAUSE");
     return 0;
-  } /*FINE modalitá funzionamento*/
+  } /*FINE modalitï¿½ funzionamento*/
   /**************************************************/
   /*Configurazione architettura per l' apprendimento*/
   if (sel_net == -1)
@@ -71,7 +84,7 @@ int main() {
     R = CreaArchitettura_file(struttura, 0);
 /**************************************************/
 APP:
-  /*apprendimento*/  // a questo punto l' architettura é pronta per essere
+  /*apprendimento*/  // a questo punto l' architettura ï¿½ pronta per essere
                      // addestrata
   ptrfile = crea_temp_file(&nameF1);
   modo = get_modo_app();  // scelta dell' algoritmo di apprendimento
@@ -89,7 +102,7 @@ APP:
   if (modo1 != NO_SPLIT)
     struttura3 =
         splitta_test_set(struttura2);  // split del training set (optionale)
-  for (epoca = 0; epoca < R->epoche; epoca++) { /*per ogni epoca*/
+  for (epoca = 0; epoca < R->epoche && !stop; epoca++) { /*per ogni epoca*/
     occ = estrai_patt_rand(struttura2->npatt);
     if (modo1 != NO_SPLIT) struttura3->mse = 0.0;
     mse = 0.0;
@@ -123,13 +136,25 @@ APP:
       nedfree(out);
       mse = (struttura3->mse / struttura3->npatt);
     }
-    if (epoca % 25 == 0) printf("\n mse %.10g epoca %d", mse, epoca);
     fprintf(ptrfile, "%g\n", mse);
+    fflush(ptrfile);
+    printf("\n mse %.10g epoca %d", mse, epoca);
+    fflush(stdout);
+
+    if (epoca == 2) {
+      fprintf_s(gnuplot, "plot \"%s\" with lines  lw 2 lc 3 \n", nameF1);
+      fflush(gnuplot);
+    } else if (epoca > 2 && (epoca % 40 == 0)) {
+      fprintf_s(gnuplot, "replot\n");
+      fflush(gnuplot);
+    }
     if (mse < R->precisione) break;
   }
   fclose(ptrfile);
+  Sleep(1);
   nameF = Net_save(R, INNF, sel_ts, LEARN_MODE, NULL, struttura2);
-  if (epoca > 0) crea_grafico(nameF, nameF1);
+  if (epoca > 0) crea_grafico(nameF, nameF1, gnuplot);
+  _fcloseall();
   system("PAUSE");
   return 0;
 }
