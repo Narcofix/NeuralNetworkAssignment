@@ -5,13 +5,10 @@
 #include <windows.h>
 #include "Neuroprototipi.h"
 
-char *narcostrstr(buf, sub, limit) register char *buf;
-register char *sub;
-register char *limit;
-{
+char *narcostrstr(register char *buf, register char *sub,
+                  register char *limit) {
   register char *bp;
   register char *sp;
-
   // caso stringa sub vuota
   if (!*sub) return buf;
   // caso stringa limit vuota

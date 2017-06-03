@@ -13,7 +13,7 @@ e il tipo dei valori usati per pesare i collegamenti tra i neuroni(arco_pesato)
 #define FLOATvals 3
 #define DOUBLEvals 4
 #define NO_SPLIT 1
-/*tipi di strutture dati per la rappresentazione*/
+
 typedef struct NEURONE *Neuroni;
 typedef struct SINAPSI {
   int S;                 /*indice strato neurone adiacente*/
@@ -80,12 +80,16 @@ typedef struct RETE {   /*rete multistrato che consiste in un array di strati*/
   tipoFattori delta_Fapp_max; /**/
 } * Rete;
 
-typedef char *NM;
+typedef struct LISTANOMI LISTANOMI;
+typedef struct LISTANOMI {
+  char *nome;
+  LISTANOMI *next;
+} Listanomi;
+
 typedef struct INFILES {
-  int nts;
-  int nnet;
-  NM *TS;
-  NM *NET;
+  char *estensione;
+  int totFiles;
+  Listanomi *HEAD;
 } inFiles;
 
 typedef struct RETESTR {  /*struttura della rete*/
@@ -114,16 +118,11 @@ struct mydata {
   Rete R;
 };
 
-// typedef struct PNGTRG{
-// /*struttura del training set*/
-// int     dim;
-// /*dimensione PNG (H * L)*/
-// int    dim_out;
-// /*dimensione di output calcolata in base alla struttura dei patern*/
-// int    *pdim;
-// /*array delle dim dei pattern*/
-// double **vals;
-// /*vettore dei valori letti*/
-// int    npatt;
-// /*numero di pattern trovati*/
+// typedef struct PNGTRG{ /*struttura del training set*/
+// int dim; /*dimensione PNG (H * L)*/
+// int dim_out; /*dimensione di output calcolata in base alla struttura dei
+// patern*/
+// int *pdim; /*array delle dim dei pattern*/
+// double **vals; /*vettore dei valori letti*/
+// int npatt; /*numero di pattern trovati*/
 //}retetrg,*Retetrg;*/

@@ -10,16 +10,15 @@ Strato InitStrato(int Num_neuroni, char tipo, int posizione,
 Rete CreaArchitettura_file(Retestr struttura, int no_pesi);
 Rete CreaArchitettura_default(Retetrg struttura2);
 Rete Crea_Architettura_CERCHI();
-// Strato	     freeStrato(Strato neuroStr);
+// Strato freeStrato(Strato neuroStr);
 int get_continue();
 int get_modo_func();
 int get_modo_app();
 void get_momento_fapp(Rete R);
 void get_mse(Rete R);
 void agg_input(Strato ptr_str, tipoNeurone* vals);
-/*int			      EsisteNeuroneOutput(Strato neuroStr, int Nj);
-int			      EsisteSinapsi(SinapsiLink head, int Nn , int
-Ns);*/
+/*int EsisteNeuroneOutput(Strato neuroStr, int Nj);
+int EsisteSinapsi(SinapsiLink head, int Nn , int Ns);*/
 void Insertsinapsi(Strato neuroStr1, Strato neuroStr2, int Ni, int Nj,
                    tipopesoSinapsi x);
 void CreaSinapsi(Strato neuroStr1, Strato neuroStr2);
@@ -39,30 +38,35 @@ tipoNeurone err_quad(Strato ptr_str, tipoNeurone* vals, int dim);
 tipoNeurone** funzionamento(Rete R, Retestr struttura, Retetrg struttura2);
 Retestr get_info_rete(Rete R);
 /*******************Prototipi per manipolare i files********************/
-inFiles* apri_dir();
-int apri_files_net(inFiles* INNF);
-int apri_files_ts(inFiles* INNF);
+inFiles* apri_dir(char* estensione);
+// int                apri_files_net(inFiles * INNF);
+// int                apri_files_ts(inFiles * INNF);
+int apri_files(inFiles* INNF);
+char* getSelezione(inFiles* INNF, int sel);
 char* apri_il_net(inFiles* INNF, int sel);
 char* apri_il_ts(inFiles* INNF, int sel);
 Retestr analizza_net(char* buff);
 Retetrg analizza_ts(char* buff);
-char* Net_save(Rete R, inFiles* INNF, int sel, int tipoF, tipoNeurone** out,
-               Retetrg struttura2);
+// char*              Net_save(Rete R,inFiles *INNF,int sel,int
+// tipoF,tipoNeurone ** out,Retetrg struttura2);
+char* Net_save(Rete R, inFiles* INNFts, inFiles* INNFnet, int sel, int tipoF,
+               tipoNeurone** out, Retetrg struttura2);
 FILE* crea_temp_file(char** prova);
-int crea_grafico(char* nameF, char* nameF_old);
+int crea_grafico(char* nameF, char* nameF_old, FILE* gnuplot);
+FILE* crea_grafico_pipe();
 char* clean_str(char* link);
 Retetrg splitta_test_set(Retetrg orig);
 /*******************Prototipi altre funzioni********************/
-char* narcostrstr(buf, sub, limit);
+char* narcostrstr(register char* buf, register char* sub, register char* limit);
 tipopesoSinapsi casual();
 int quadrato(int x);
 tipoNeurone sigm_uni(tipoNeurone x);
 tipoNeurone derivata_sigm(tipoNeurone rete_out);
+/*******************funzioni matematiche********************/
 #define sign(x) (((x) < 0) ? -1 : (((x) == 0) ? 0 : 1))
 #define taglio(x, basso, alto) \
   (((x) < (basso)) ? (basso) : (((x) > (alto)) ? (alto) : (x)))
 #define trasforma(val, min, max) ((((float)(val - min)) / ((float)(max - min))))
-
 int* estrai_patt_rand(int k);
 /*******************Costanti dichiarate visibili a tutto il
  * progetto********************/

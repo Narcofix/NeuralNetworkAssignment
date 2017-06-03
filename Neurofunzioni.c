@@ -1,18 +1,18 @@
 #include <math.h>
-#include <process.h>
 #include <stdio.h>
 #include <stdlib.h>
+//#include "nedmalloc.h"
+#include <process.h>
 #include <string.h>
 #include <windows.h>
 #include "Neuroprototipi.h"
-#include "nedmalloc.h"
 //#include <windows.h>
 /*funzione per inizializzare la rete*/
 
 Rete InitReteN(int Num_Strati, int epoche, tipoFattori Fapp,
                tipoFattori momentum) {
-  Rete R = nedcalloc(1, sizeof(*R));
-  R->ptr_str = nedcalloc(Num_Strati, sizeof(Strato));
+  Rete R = calloc(1, sizeof(*R));
+  R->ptr_str = calloc(Num_Strati, sizeof(Strato));
   R->nstrati = Num_Strati;
   R->epoche = epoche;      // numero di epoche
   R->Fapp = Fapp;          // fattore di apprendimento
@@ -34,7 +34,7 @@ Rete CreaArchitettura_file(Retestr struttura, int no_pesi) {
     R->ptr_str[i] = InitStrato(struttura->dim[i], c, i, sigm_uni);
   }
   if (no_pesi) {
-    /*creo le sinapsi con i valori casuali poiché assenti da file*/
+    /*creo le sinapsi con i valori casuali poichï¿½ assenti da file*/
     for (i = 0; i < R->nstrati - 1; i++) {
       CreaSinapsi(R->ptr_str[i], R->ptr_str[i + 1]);
     }
@@ -108,13 +108,13 @@ Rete CreaArchitettura_default(Retetrg struttura2) {
 Strato InitStrato(int Num_neuroni, char tipo, int posizione,
                   tipoNeurone (*funz_att)(tipoNeurone val_x)) {
   int i;
-  Strato neuroStr = (Strato)nedmalloc(sizeof(*neuroStr));
+  Strato neuroStr = (Strato)malloc(sizeof(*neuroStr));
   neuroStr->num_neuro_el = Num_neuroni;
   neuroStr->tipo_strato = tipo;
   neuroStr->num_strato = posizione;
-  neuroStr->neuro_el = nedcalloc(Num_neuroni, sizeof(Neurone));
+  neuroStr->neuro_el = calloc(Num_neuroni, sizeof(Neurone));
   for (i = 0; i < Num_neuroni; i++) {
-    neuroStr->neuro_el[i].funz_attivazione = nedmalloc(sizeof(funz_att));
+    neuroStr->neuro_el[i].funz_attivazione = malloc(sizeof(funz_att));
     neuroStr->neuro_el[i].funz_attivazione = funz_att;
     neuroStr->neuro_el[i].next = NULL;
     neuroStr->neuro_el[i].inn = NULL;
@@ -171,7 +171,7 @@ void Insertsinapsi(Strato neuroStr1, Strato neuroStr2, int Ni, int Nj,
   SinapsiLink head;
   BackLinks backhead;
   // inserisco la sinapsi
-  head = nedmalloc(sizeof(*head));
+  head = malloc(sizeof(*head));
   head->N = neuroStr2->neuro_el + Nj;  // neurone in cui finisco
   head->S = neuroStr2->num_strato;
   head->W = x;
@@ -189,7 +189,7 @@ void Insertsinapsi(Strato neuroStr1, Strato neuroStr2, int Ni, int Nj,
   }
   // inserisco il backlink
   if (neuroStr1->tipo_strato != 'o') {
-    backhead = nedmalloc(sizeof(*backhead));
+    backhead = malloc(sizeof(*backhead));
     backhead->N = neuroStr1->neuro_el + Ni;  // neurone da cui provengo
     backhead->Ni = Ni;
     backhead->S = neuroStr1->num_strato;
@@ -656,8 +656,8 @@ Rete Crea_Architettura_CERCHI() {
 
 Retestr get_info_rete(Rete R) {
   int i;
-  Retestr struttura = nedcalloc(1, sizeof(retestr));  // preparo la struttura
-  struttura->dim = nedcalloc(R->nstrati, sizeof(int));
+  Retestr struttura = calloc(1, sizeof(retestr));  // preparo la struttura
+  struttura->dim = calloc(R->nstrati, sizeof(int));
   struttura->ndim = R->nstrati;
   for (i = 0; i < R->nstrati; i++)
     struttura->dim[i] = R->ptr_str[i]->num_neuro_el;
@@ -808,9 +808,9 @@ void propagavals(Rete R) {
     //	  //local[0]->j=j;
     //	  //local[0]->R=R;
     //	  //pot[0]=(HANDLE)	_beginthreadex (
-    // NULL,0,&potential_T,local[0],0,NULL);
+    //NULL,0,&potential_T,local[0],0,NULL);
     //	  R->ptr_str[j]->neuro_el[0+k].val_x  =
-    // potential(R->ptr_str[j]->neuro_el+0+k);
+    //potential(R->ptr_str[j]->neuro_el+0+k);
     //   R->ptr_str[j]->neuro_el[0+k].soglia =
     //   sigm_uni(R->ptr_str[j]->neuro_el[0+k].val_x+R->ptr_str[j]->neuro_el[0+k].bias);
     //		}
@@ -819,9 +819,9 @@ void propagavals(Rete R) {
     //	  //local[1]->j=j;
     //	  //local[1]->R=R;
     //	  //pot[1]=(HANDLE)	_beginthreadex (
-    // NULL,0,&potential_T,local[1],0,NULL);
+    //NULL,0,&potential_T,local[1],0,NULL);
     //			R->ptr_str[j]->neuro_el[1+k].val_x  =
-    // potential(R->ptr_str[j]->neuro_el+1+k);
+    //potential(R->ptr_str[j]->neuro_el+1+k);
     //   R->ptr_str[j]->neuro_el[1+k].soglia =
     //   sigm_uni(R->ptr_str[j]->neuro_el[1+k].val_x+R->ptr_str[j]->neuro_el[1+k].bias);
     //		}
@@ -830,9 +830,9 @@ void propagavals(Rete R) {
     //	  //local[1]->j=j;
     //	  //local[1]->R=R;
     //	  //pot[1]=(HANDLE)	_beginthreadex (
-    // NULL,0,&potential_T,local[1],0,NULL);
+    //NULL,0,&potential_T,local[1],0,NULL);
     //			R->ptr_str[j]->neuro_el[2+k].val_x  =
-    // potential(R->ptr_str[j]->neuro_el+2+k);
+    //potential(R->ptr_str[j]->neuro_el+2+k);
     //   R->ptr_str[j]->neuro_el[2+k].soglia =
     //   sigm_uni(R->ptr_str[j]->neuro_el[2+k].val_x+R->ptr_str[j]->neuro_el[2+k].bias);
     //		}
@@ -841,9 +841,9 @@ void propagavals(Rete R) {
     //	  //local[1]->j=j;
     //	  //local[1]->R=R;
     //	  //pot[1]=(HANDLE)	_beginthreadex (
-    // NULL,0,&potential_T,local[1],0,NULL);
+    //NULL,0,&potential_T,local[1],0,NULL);
     //			R->ptr_str[j]->neuro_el[3+k].val_x  =
-    // potential(R->ptr_str[j]->neuro_el+3+k);
+    //potential(R->ptr_str[j]->neuro_el+3+k);
     //   R->ptr_str[j]->neuro_el[3+k].soglia =
     //   sigm_uni(R->ptr_str[j]->neuro_el[3+k].val_x+R->ptr_str[j]->neuro_el[3+k].bias);
     //		}
@@ -852,9 +852,9 @@ void propagavals(Rete R) {
     //	  //local[1]->j=j;
     //	  //local[1]->R=R;
     //	  //pot[1]=(HANDLE)	_beginthreadex (
-    // NULL,0,&potential_T,local[1],0,NULL);
+    //NULL,0,&potential_T,local[1],0,NULL);
     //			R->ptr_str[j]->neuro_el[4+k].val_x  =
-    // potential(R->ptr_str[j]->neuro_el+4+k);
+    //potential(R->ptr_str[j]->neuro_el+4+k);
     //   R->ptr_str[j]->neuro_el[4+k].soglia =
     //   sigm_uni(R->ptr_str[j]->neuro_el[4+k].val_x+R->ptr_str[j]->neuro_el[4+k].bias);
     //		}
@@ -870,7 +870,7 @@ tipoNeurone potential(Neuroni ptr1) {
   tipoNeurone out_val = (tipoNeurone)0.0;
   BackLinks ptr2;
   // int i=0;
-  /* Per ogni sinapsi in ingresso al neurone...*/
+  /*ï¿½Perï¿½ogniï¿½sinapsiï¿½inï¿½ingressoï¿½alï¿½neurone...*/
   ptr2 = ptr1->inn;
   while (ptr2 != NULL) {
     out_val += ptr2->N->soglia * ptr2->back->W;
@@ -884,7 +884,7 @@ unsigned __stdcall potential_T(void *pmydata) {
   int i = local->i, j = local->j;
   tipoNeurone out_val = (tipoNeurone)0.0;
   BackLinks ptr2;
-  /* Per ogni sinapsi in ingresso al neurone...*/
+  /*ï¿½Perï¿½ogniï¿½sinapsiï¿½inï¿½ingressoï¿½alï¿½neurone...*/
   ptr2 = local->R->ptr_str[j]->neuro_el[i].inn;
   while (ptr2 != NULL) {
     out_val += ptr2->N->soglia * ptr2->back->W;
@@ -1042,10 +1042,9 @@ tipoNeurone err_quad(Strato ptr_str, tipoNeurone *vals, int dim) {
 tipoNeurone **funzionamento(Rete R, Retestr struttura, Retetrg struttura2) {
   int i, k, dim = 1;
   tipoNeurone **out;
-  out = nedmalloc(struttura2->npatt * sizeof(tipoNeurone *));
+  out = malloc(struttura2->npatt * sizeof(tipoNeurone *));
   for (i = 0; i < struttura2->npatt; i++) {
-    out[i] =
-        nedmalloc(struttura->dim[struttura->ndim - 1] * sizeof(tipoNeurone));
+    out[i] = malloc(struttura->dim[struttura->ndim - 1] * sizeof(tipoNeurone));
   }
   /*eseguo funzionamento*/
   for (k = 0; k < struttura2->npatt; k++) {

@@ -6,7 +6,7 @@
 #include <time.h>
 #include <windows.h>
 #include "Neuroprototipi.h"
-#include "nedmalloc.h"
+
 /*******************/ /***************************************************************/
 /*homework parte 1 */ /**/
 /*Manuel Apilongo  */ /**/
@@ -25,23 +25,23 @@ int main() {
   char *nameF, *nameF1;
   tipoNeurone mse = 0.0, **out;
   Rete R;
-  inFiles* INNF;
+  inFiles *INNFts, *INNFnet;
   Retestr struttura;
   Retetrg struttura2, struttura3;
   FILE* ptrfile;
   FILE* gnuplot;
-  /*inizializzo il trapper*/
-  signal(SIGINT, esci);
-  /*cerco i file da aprire*/
+
+  signal(SIGINT, esci); /*inizializzo il trapper*/
   gnuplot = crea_grafico_pipe();
-  INNF = apri_dir();
-  sel_net = apri_files_net(INNF); /*lista file .net disponibili*/
+  INNFnet = apri_dir("*.net");
+  sel_net = apri_files(INNFnet); /*lista file .net disponibili*/
   if (sel_net != -1 && sel_net != -2)
-    struttura =
-        analizza_net(apri_il_net(INNF, sel_net)); /*caso architettura da file*/
-  sel_ts = apri_files_ts(INNF);                   /*lista file .ts disponibili*/
+    struttura = analizza_net(
+        apri_il_net(INNFnet, sel_net)); /*caso architettura da file*/
+  INNFts = apri_dir("*.ts");
+  sel_ts = apri_files(INNFts); /*lista file .ts disponibili*/
   struttura2 =
-      analizza_ts(apri_il_ts(INNF, sel_ts)); /*bufferizzazione file ts*/
+      analizza_ts(apri_il_ts(INNFts, sel_ts)); /*bufferizzazione file ts*/
   if (struttura2->dim_out != 0 &&
       (sel_net != -1)) {                 /*Scelta tipo di esecuzione: */
     modo = get_modo_func();              /*   viene richiesto se      */
@@ -60,7 +60,8 @@ int main() {
     }
     R = CreaArchitettura_file(struttura, 0);
     out = funzionamento(R, struttura, struttura2);
-    if ((Net_save(R, INNF, sel_net, FUNC_MODE, out, struttura2)) == NULL) {
+    if ((Net_save(R, INNFts, INNFnet, sel_net, FUNC_MODE, out, struttura2)) ==
+        NULL) {
       struttura2->dim_out = old_dim_out;
       goto APP;
     }
@@ -133,7 +134,7 @@ APP:
                 su pattern sconosciuti*/
       struttura = get_info_rete(R);
       out = funzionamento(R, struttura, struttura3);
-      nedfree(out);
+      free(out);
       mse = (struttura3->mse / struttura3->npatt);
     }
     fprintf(ptrfile, "%g\n", mse);
@@ -152,8 +153,13 @@ APP:
   }
   fclose(ptrfile);
   Sleep(1);
-  nameF = Net_save(R, INNF, sel_ts, LEARN_MODE, NULL, struttura2);
-  if (epoca > 0) crea_grafico(nameF, nameF1, gnuplot);
+  nameF = Net_save(R, INNFts, INNFnet, sel_ts, LEARN_MODE, NULL, struttura2);
+  if (epoca > 0)
+    crea_grafico(nameF, nameF1, gnuplot);
+  else {
+    printf("Non c'e' stato apprendimento...");
+    system("pause");
+  }
   _fcloseall();
   system("PAUSE");
   return 0;
